@@ -5,11 +5,14 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.document import Document
 from app.schemas.document import DocumentCreate
+from app.routers.documents import router as documents_router
 
 app=FastAPI(
     title="Agentic RAG API",
     version="1.0.0"
 )
+
+app.include_router(documents_router)
 
 from app.database import engine,Base
 Base.metadata.create_all(bind=engine)
