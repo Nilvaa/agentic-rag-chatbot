@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models.conversation import Conversation
 from app.models.message import Message
+from app.models.user import User
+from app.dependencies.auth import get_current_user
 
 router=APIRouter(
     prefix="/conversations",
@@ -20,10 +22,12 @@ def get_db():
 
 @router.get("/")
 def get_conversations(
-    db:Session=Depends(get_db)
+    db:Session=Depends(get_db),
+    current_user:User=Depends(get_current_user)
 ):
     conversations=(
         db.query(Conversation)
+        .filter(Conversation.user_id==current_user.id)
         .order_by(Conversation.created_at.desc())
         .all()
     )
@@ -33,11 +37,13 @@ def get_conversations(
 @router.get("/{conversation_id}")
 def get_conversation(
     conversation_id:int,
-    db:Session=Depends(get_db)
+    db:Session=Depends(get_db),
+    current_user: User=Depends(get_current_user)
 ):
     conversation=(
         db.query(Conversation)
-        .filter(Conversation.id==conversation_id)
+        .filter(Conversation.id==conversation_id,
+                Conversation.user_id==current_user.id)
         .first()
     )
 
@@ -72,11 +78,13 @@ def get_conversation(
 @router.delete("/{conversation_id}")
 def delete_conversations(
     conversation_id:int,
-    db: Session=Depends(get_db)
+    db: Session=Depends(get_db),
+    current_user: User=Depends(get_current_user)
 ):
     conversation=(
         db.query(Conversation)
-        .filter(Conversation.id==conversation_id)
+        .filter(Conversation.id==conversation_id,
+                Conversation.user_id==current_user.id)
         .first()
         )
 

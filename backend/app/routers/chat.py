@@ -1,6 +1,5 @@
 from fastapi import APIRouter,Depends,HTTPException
 from sqlalchemy.orm import Session
-from datetime import datetime,timezone
 
 from app.database import SessionLocal
 from app.schemas.chat import ChatRequest,ChatResponse
@@ -8,6 +7,9 @@ from app.services.retrieval_service import RetrievalService
 from app.services.llm_service import LLMService
 from app.models.conversation import Conversation
 from app.models.message import Message
+from app.models.user import User
+
+from app.dependencies.auth import get_current_user
 
 router=APIRouter(
     prefix="/chat",
@@ -25,13 +27,15 @@ def get_db():
 @router.post("/",response_model=ChatResponse)
 def chat(
     request:ChatRequest,
-    db:Session=Depends(get_db)
+    db:Session=Depends(get_db),
+    current_user: User=Depends(get_current_user)
 ):
 
     #to get existing conversation id / create new 
     if request.conversation_id:
         conversation=db.query(Conversation).filter(
-            Conversation.id==request.conversation_id
+            Conversation.id==request.conversation_id,
+            Conversation.user_id==current_user.id
         ).first()
 
         if not conversation:
@@ -40,7 +44,9 @@ def chat(
                 detail="Conversation not found"
             )
     else:
-        conversation=Conversation()
+        conversation=Conversation(
+            user_id=current_user.id
+        )
         db.add(conversation)
         db.flush()
 
@@ -60,7 +66,7 @@ def chat(
         db.query(Message)
         .filter(Message.conversation_id==conversation.id,
                 Message.id!=user_message.id
-            ).order_by(Message.id)
+            ).order_by(Message.created_at)
             .all()
     )
 
@@ -104,7 +110,6 @@ Chunk: {chunk.chunk_index}
     )
 
     db.add(assistant_message)
-    conversation.updated_at=datetime.now(timezone.utc)
     db.commit()
 
 
