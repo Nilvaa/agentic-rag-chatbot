@@ -6,6 +6,8 @@ from app.database import get_db
 from app.models.document import Document
 from app.schemas.document import DocumentCreate
 from app.routers.documents import router as documents_router
+from app.routers.chat import router as chat_router
+from app.routers.conversation import router as conversation_router
 
 app=FastAPI(
     title="Agentic RAG API",
@@ -13,6 +15,8 @@ app=FastAPI(
 )
 
 app.include_router(documents_router)
+app.include_router(chat_router)
+app.include_router(conversation_router)
 
 from app.database import engine,Base
 Base.metadata.create_all(bind=engine)

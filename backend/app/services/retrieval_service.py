@@ -1,4 +1,6 @@
 from sqlalchemy.orm import Session
+
+from app.models.document import Document
 from app.models.document_chunk import DocumentChunk
 from app.services.embedding_service import EmbeddingService
 
@@ -14,7 +16,8 @@ class RetrievalService:
         )
 
         results=(
-            db.query(DocumentChunk,DocumentChunk.embedding.cosine_distance(query_embedding).label("distance"))
+            db.query(DocumentChunk,Document.filename,DocumentChunk.embedding.cosine_distance(query_embedding).label("distance"))
+            .join(Document,DocumentChunk.document_id==Document.id)
             .filter(DocumentChunk.embedding.is_not(None))
             .order_by(DocumentChunk.embedding.cosine_distance(query_embedding))
             .limit(top_k).all()

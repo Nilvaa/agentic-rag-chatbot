@@ -8,6 +8,8 @@ from alembic import context
 from app.database import Base,settings
 from app.models.document import Document
 from app.models.document_chunk import DocumentChunk
+from app.models.conversation import Conversation
+from app.models.message import Message
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
