@@ -1,4 +1,4 @@
-from sqlalchemy import DateTime,Column,Integer,ForeignKey
+from sqlalchemy import DateTime,Column,Integer,ForeignKey,String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -18,6 +18,10 @@ class Conversation(Base):
         nullable=False
     )
 
+    title=Column(
+        String,
+        nullable=False
+    )
     created_at=Column(
         DateTime(timezone=True),
         server_default=func.now(),

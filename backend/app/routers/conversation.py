@@ -32,7 +32,14 @@ def get_conversations(
         .all()
     )
 
-    return conversations
+    return [{
+        "id":conversation.id,
+        "title":conversation.title,
+        "created_by":conversation.created_at,
+        "updated_at": conversation.updated_at
+    }
+    for conversation in conversations
+    ]
 
 @router.get("/{conversation_id}")
 def get_conversation(
@@ -66,10 +73,11 @@ def get_conversation(
         "updated_at":conversation.updated_at,
         "messages":[
             {
-                "id":message.id,
-                "role":message.role,
-                "content":message.content,
-                "created_at":message.created_at
+                "id": message.id,
+                "role": message.role,
+                "content": message.content,
+                "sources": message.sources or [],
+                "created_at": message.created_at
             }
             for message in messages
         ]

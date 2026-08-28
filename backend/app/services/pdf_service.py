@@ -13,5 +13,5 @@ def extract_text_from_pdf(file_path:str):
             "text":text
         })
 
-        document.close()
-        return pages
+    document.close()
+    return pages

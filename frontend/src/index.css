@@ -1,8 +1,357 @@
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  background: #f7f7f8;
+  color: #222;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* =========================
+   MAIN APP
+========================= */
+
+.chat-app {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: #202123;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 20px;
+}
+
+.sidebar-header h2 {
+  margin: 0 0 25px;
+  font-size: 22px;
+}
+
+/* New chat */
+
+.new-chat-button {
+  width: 100%;
+  padding: 11px 14px;
+
+  background: transparent;
+  color: white;
+
+  border: 1px solid #565869;
+  border-radius: 8px;
+
+  text-align: left;
+}
+
+.new-chat-button:hover {
+  background: #343541;
+}
+
+/* Conversations */
+
+.conversation-section {
+  margin-top: 30px;
+}
+
+.conversation-section h3 {
+  margin: 0 0 10px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  color: #aaa;
+  text-transform: uppercase;
+}
+
+.conversation-item {
+  display: block;
+
+  width: 100%;
+  padding: 11px 12px;
+  margin-bottom: 4px;
+
+  background: transparent;
+  color: #ddd;
+
+  border: none;
+  border-radius: 7px;
+
+  text-align: left;
+}
+
+.conversation-item:hover {
+  background: #343541;
+}
+
+.conversation-item.active {
+  background: #343541;
+  color: white;
+}
+
+/* Logout */
+
+.sidebar-bottom {
+  margin-top: auto;
+}
+
+.logout-button {
+  width: 100%;
+  padding: 11px;
+
+  background: transparent;
+  color: white;
+
+  border: 1px solid #565869;
+  border-radius: 7px;
+}
+
+.logout-button:hover {
+  background: #343541;
+}
+
+/* =========================
+   MAIN CHAT
+========================= */
+
+.chat-main {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  background: white;
+}
+
+/* Header */
+
+.chat-header {
+  height: 65px;
+  min-height: 65px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 30px;
+
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.chat-header h1 {
+  margin: 0;
+
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* =========================
+   CHAT CONTENT
+========================= */
+
+.chat-content {
+  flex: 1;
+
+  overflow-y: auto;
+
+  padding: 40px 12%;
+}
+
+/* Welcome screen */
+
+.welcome {
+  text-align: center;
+
+  margin-top: 20vh;
+}
+
+.welcome h2 {
+  margin-bottom: 10px;
+
+  font-size: 30px;
+}
+
+.welcome p {
+  color: #666;
+}
+
+/* =========================
+   MESSAGES
+========================= */
+
+.message {
+  max-width: 850px;
+
+  margin: 0 auto 30px;
+}
+
+.message-label {
+  margin-bottom: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.message-bubble {
+  padding: 15px 18px;
+
+  background: #f1f1f1;
+
+  border-radius: 10px;
+
+  line-height: 1.6;
+}
+
+/* =========================
+   ERROR
+========================= */
+
+.error-message {
+  max-width: 850px;
+
+  margin: 20px auto;
+
+  padding: 12px 15px;
+
+  background: #ffe5e5;
+  color: #b00020;
+
+  border-radius: 8px;
+}
+
+/* =========================
+   INPUT AREA
+========================= */
+
+.chat-input-container {
+  padding: 20px 12%;
+
+  border-top: 1px solid #e5e5e5;
+
+  background: white;
+}
+
+.chat-form {
+  max-width: 850px;
+
+  display: flex;
+
+  margin: 0 auto;
+
+  gap: 10px;
+}
+
+.chat-form input {
+  flex: 1;
+
+  padding: 14px 16px;
+
+  background: white;
+
+  border: 1px solid #ccc;
+  border-radius: 10px;
+
+  outline: none;
+}
+
+.chat-form input:focus {
+  border-color: #777;
+}
+
+.chat-form button {
+  padding: 0 22px;
+
+  background: #202123;
+  color: white;
+
+  border: none;
+  border-radius: 10px;
+}
+
+.chat-form button:hover {
+  background: #343541;
+}
+
+.chat-form button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 700px) {
+  .sidebar {
+    width: 210px;
+    min-width: 210px;
+  }
+
+  .chat-content {
+    padding: 30px 20px;
+  }
+
+  .chat-input-container {
+    padding: 15px 20px;
+  }
+}
+/* =========================
+   SOURCES
+========================= */
+
+.sources {
+  max-width: 850px;
+  margin: 20px auto 0;
+}
+
+.sources h3 {
+  margin: 0 0 10px;
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.source-item {
+  padding: 12px 15px;
+  margin-bottom: 8px;
+
+  background: #fafafa;
+
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+}
+
+.source-file {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.source-details {
+  margin: 5px 0 0;
+
+  font-size: 13px;
+  color: #777;
 }

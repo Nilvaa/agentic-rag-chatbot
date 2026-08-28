@@ -3,8 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
 from app.schemas.chat import ChatRequest,ChatResponse
-from app.services.retrieval_service import RetrievalService
-from app.services.llm_service import LLMService
+from app.services.agent_service import AgentService
 from app.models.conversation import Conversation
 from app.models.message import Message
 from app.models.user import User
@@ -24,6 +23,13 @@ def get_db():
     finally:
         db.close()
 
+def generate_title(question:str):
+    title=question.strip()
+
+    if len(title)>50:
+        title=title[:50].rstrip()+"..."
+    return title
+
 @router.post("/",response_model=ChatResponse)
 def chat(
     request:ChatRequest,
@@ -32,7 +38,7 @@ def chat(
 ):
 
     #to get existing conversation id / create new 
-    if request.conversation_id:
+    if request.conversation_id is not None:
         conversation=db.query(Conversation).filter(
             Conversation.id==request.conversation_id,
             Conversation.user_id==current_user.id
@@ -45,7 +51,8 @@ def chat(
             )
     else:
         conversation=Conversation(
-            user_id=current_user.id
+            user_id=current_user.id,
+            title=generate_title(request.question)
         )
         db.add(conversation)
         db.flush()
@@ -76,51 +83,26 @@ def chat(
     )
 
         
-    retrieve_service=RetrievalService()
+    agent=AgentService()
 
-    results=retrieve_service.search(
-        query=request.question,
-        db=db,
-        top_k=3
-    )
-
-    context = "\n\n".join(
-        f"""
-Source: {filename}
-Page: {chunk.page_number}
-Chunk: {chunk.chunk_index}
-
-{chunk.content}
-"""
-        for chunk, filename, distance in results
-    )
-
-    llm_service=LLMService()
-
-    answer=llm_service.generate_answer(
+    result=agent.run(
         question=request.question,
-        context=context,
+        db=db,
         history=history
     )
+
+    answer=result["answer"]
+    sources=result["sources"]
 
     assistant_message=Message(
         conversation_id=conversation.id,
         role="assistant",
-        content=answer
+        content=answer,
+        sources=sources
     )
 
     db.add(assistant_message)
     db.commit()
-
-
-    sources=[
-        {
-            "filename":filename,
-            "page":chunk.page_number,
-            "chunk":chunk.chunk_index
-        }
-        for chunk,filename,distance in results
-    ]
 
     return {
         "conversation_id":conversation.id,

@@ -9,17 +9,18 @@ class RetrievalService:
         self.embedding_service=EmbeddingService()
 
     def search(
-            self,query:str,db:Session,top_k:int=3
+            self,query:str,db:Session,top_k:int=3,document_name:str | None=None
     ):
         query_embedding=(
             self.embedding_service.generate_embedding(query)
         )
 
-        results=(
+        query=(
             db.query(DocumentChunk,Document.filename,DocumentChunk.embedding.cosine_distance(query_embedding).label("distance"))
             .join(Document,DocumentChunk.document_id==Document.id)
-            .filter(DocumentChunk.embedding.is_not(None))
-            .order_by(DocumentChunk.embedding.cosine_distance(query_embedding))
-            .limit(top_k).all()
-        )
+            .filter(DocumentChunk.embedding.is_not(None)))
+        if document_name:
+            query=query.filter(Document.filename.ilike(f"%{document_name}%"))
+        results=query.order_by(DocumentChunk.embedding.cosine_distance(query_embedding)).limit(top_k).all()
+        
         return results

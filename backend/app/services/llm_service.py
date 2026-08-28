@@ -1,47 +1,113 @@
 import ollama
 
+
 class LLMService:
+
     def __init__(self):
-        self.model="llama3.1:8b"
+        self.model = "llama3.1:8b"
 
     def generate_answer(
-            self,
-            question:str,
-            context:str,
-            history:str= ""
+        self,
+        question: str,
+        context: str,
+        history: str = "",
+        source_type: str = "document"
     ):
-        prompt=f"""
-You are a helpful assistant that answers questions using the provided
-document context and conversation history.
 
-Use ONLY the information provided in the document context to answer
-questions about the documents.
+        if source_type == "web":
 
-The conversation history is provided only to understand references
-and follow-up questions.
+            prompt = f"""
+You are a helpful AI assistant.
 
-If the answer cannot be found in the document context, say:
-"I could not find the answer in the provided documents."
+Your task is to answer ONLY the CURRENT QUESTION.
 
-Do not make up information.
+The answer must be based on the provided WEB SEARCH RESULTS.
 
-Conversation History:
+IMPORTANT RULES:
+
+1. Answer ONLY the current question.
+2. Do NOT answer or discuss previous questions.
+3. Do NOT mention previous questions unless the current question
+   explicitly refers to them.
+4. Conversation history is provided ONLY to understand follow-up
+   references such as:
+   - "it"
+   - "they"
+   - "that"
+   - "this"
+   - "the company"
+   - "the person"
+5. Do NOT use unrelated information from the conversation history.
+6. Use the web search results as the factual source for your answer.
+7. Do not make up information.
+8. If the web search results do not contain enough information,
+   say exactly:
+
+"I could not find enough reliable information."
+
+CONVERSATION HISTORY:
 {history}
 
-Document Context:
+WEB SEARCH RESULTS:
 {context}
 
-Current Question:
+CURRENT QUESTION:
 {question}
 
-Answer:
+ANSWER:
 """
-        response=ollama.chat(
-            model=self.model,messages=[
+
+        else:
+
+            prompt = f"""
+You are a helpful document-based AI assistant.
+
+Your task is to answer ONLY the CURRENT QUESTION.
+
+The answer must be based on the provided DOCUMENT CONTEXT.
+
+IMPORTANT RULES:
+
+1. Answer ONLY the current question.
+2. Do NOT answer or discuss previous questions.
+3. Do NOT mention previous questions unless the current question
+   explicitly refers to them.
+4. Conversation history is provided ONLY to understand follow-up
+   references such as:
+   - "it"
+   - "they"
+   - "that"
+   - "this"
+   - "the company"
+   - "the policy"
+5. Do NOT use unrelated information from the conversation history.
+6. Use ONLY the provided document context for factual information.
+7. Do not make up information.
+8. If the answer cannot be found in the document context,
+   say exactly:
+
+"I could not find the answer in the provided documents."
+
+CONVERSATION HISTORY:
+{history}
+
+DOCUMENT CONTEXT:
+{context}
+
+CURRENT QUESTION:
+{question}
+
+ANSWER:
+"""
+
+        response = ollama.chat(
+            model=self.model,
+            messages=[
                 {
-                    "role":"user",
-                    "content":prompt
+                    "role": "user",
+                    "content": prompt
                 }
             ]
         )
+
         return response["message"]["content"]
