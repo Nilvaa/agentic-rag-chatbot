@@ -355,3 +355,46 @@ button {
   font-size: 13px;
   color: #777;
 }
+
+.conversation-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 6px;
+    border-radius: 8px;
+}
+
+.conversation-wrapper.active {
+    background: #343541;
+}
+
+.conversation-item {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: white;
+    text-align: left;
+    padding: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    border-radius: 8px;
+}
+
+.conversation-item:hover {
+    background: #2a2b32;
+}
+
+.delete-conversation-button {
+    border: none;
+    background: transparent;
+    color: #aaa;
+    cursor: pointer;
+    padding: 8px;
+    margin-right: 5px;
+    border-radius: 6px;
+}
+
+.delete-conversation-button:hover {
+    background: #444;
+    color: white;
+}

@@ -4,6 +4,7 @@ import {
     sendMessage,
     getConversations,
     getConversation,
+    deleteConversations,
     logoutUser
 } from "../services/api";
 
@@ -224,6 +225,40 @@ function Chat() {
         }
     }
 
+    async function handleDeleteConversation(id) {
+
+    const confirmed = window.confirm(
+        "Are you sure you want to delete this conversation?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    setError("");
+
+    try {
+
+        await deleteConversations(id);
+
+        setConversations((prev) =>
+            prev.filter(
+                (conversation) =>
+                    conversation.id !== id
+            )
+        );
+
+        if (conversationId === id) {
+            setConversationId(null);
+            setAnswer("");
+            setSources([]);
+            setQuestion("");
+        }
+
+    } catch (error) {
+        setError(error.message);
+    }
+}
 
     // ==================================================
     // NEW CHAT
@@ -243,6 +278,8 @@ function Chat() {
 
         setError("");
     }
+
+
 
 
     // ==================================================
@@ -303,21 +340,40 @@ function Chat() {
                     {conversations.map(
                         (conversation) => (
 
-                            <button
-    key={conversation.id}
-    className={`conversation-item ${
+                           <div
+    className={`conversation-wrapper ${
         conversationId === conversation.id
             ? "active"
             : ""
     }`}
-    onClick={() =>
-        handleConversationClick(
-            conversation.id
-        )
-    }
+    key={conversation.id}
 >
-    {conversation.title || `Conversation ${conversation.id}`}
-</button>
+
+    <button
+        className="conversation-item"
+        onClick={() =>
+            handleConversationClick(
+                conversation.id
+            )
+        }
+    >
+        {conversation.title ||
+            `Conversation ${conversation.id}`}
+    </button>
+
+    <button
+        className="delete-conversation-button"
+        onClick={() =>
+            handleDeleteConversation(
+                conversation.id
+            )
+        }
+        title="Delete conversation"
+    >
+        🗑️
+    </button>
+
+</div>
 
                         )
                     )}
