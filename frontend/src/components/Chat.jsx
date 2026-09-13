@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import {
     sendMessage,
@@ -26,10 +26,16 @@ function Chat() {
 
     const [error, setError] = useState("");
 
-
+    const messageEndRef=useRef(null);
     // ==================================================
     // SEND MESSAGE
     // ==================================================
+
+    useEffect(()=>{
+        messageEndRef.current?.scrollIntroView({
+            behavior:"smooth"
+        });
+    },[messages]);
 
     async function handleSubmit(event) {
 
@@ -188,22 +194,22 @@ function Chat() {
             // ------------------------------------------
 
             if (
-    data.messages &&
-    data.messages.length > 0
-) {
-    const loadedMessages =
-        data.messages.map((message) => ({
-            id: message.id,
-            role: message.role,
-            content: message.content,
-            sources: message.sources || []
-        }));
+                data.messages &&
+                data.messages.length > 0
+            ) {
+                const loadedMessages =
+                    data.messages.map((message) => ({
+                        id: message.id,
+                        role: message.role,
+                        content: message.content,
+                        sources: message.sources || []
+                    }));
 
-    setMessages(loadedMessages);
+                setMessages(loadedMessages);
 
-} else {
-    setMessages([]);
-}
+            } else {
+                setMessages([]);
+            }
 
 
             setQuestion("");
@@ -227,38 +233,38 @@ function Chat() {
 
     async function handleDeleteConversation(id) {
 
-    const confirmed = window.confirm(
-        "Are you sure you want to delete this conversation?"
-    );
-
-    if (!confirmed) {
-        return;
-    }
-
-    setError("");
-
-    try {
-
-        await deleteConversations(id);
-
-        setConversations((prev) =>
-            prev.filter(
-                (conversation) =>
-                    conversation.id !== id
-            )
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this conversation?"
         );
 
-        if (conversationId === id) {
-            setConversationId(null);
-            setAnswer("");
-            setSources([]);
-            setQuestion("");
+        if (!confirmed) {
+            return;
         }
 
-    } catch (error) {
-        setError(error.message);
+        setError("");
+
+        try {
+
+            await deleteConversations(id);
+
+            setConversations((prev) =>
+                prev.filter(
+                    (conversation) =>
+                        conversation.id !== id
+                )
+            );
+
+            if (conversationId === id) {
+                setConversationId(null);
+                setAnswer("");
+                setSources([]);
+                setQuestion("");
+            }
+
+        } catch (error) {
+            setError(error.message);
+        }
     }
-}
 
     // ==================================================
     // NEW CHAT
@@ -340,40 +346,38 @@ function Chat() {
                     {conversations.map(
                         (conversation) => (
 
-                           <div
-    className={`conversation-wrapper ${
-        conversationId === conversation.id
-            ? "active"
-            : ""
-    }`}
-    key={conversation.id}
->
+                            <div
+                                className={`conversation-wrapper ${conversationId === conversation.id
+                                        ? "active"
+                                        : ""
+                                    }`}
+                                key={conversation.id}
+                            >
 
-    <button
-        className="conversation-item"
-        onClick={() =>
-            handleConversationClick(
-                conversation.id
-            )
-        }
-    >
-        {conversation.title ||
-            `Conversation ${conversation.id}`}
-    </button>
+                                <button
+                                    className="conversation-item"
+                                    onClick={() =>
+                                        handleConversationClick(
+                                            conversation.id
+                                        )
+                                    }
+                                >
+                                    {conversation.title}
+                                </button>
 
-    <button
-        className="delete-conversation-button"
-        onClick={() =>
-            handleDeleteConversation(
-                conversation.id
-            )
-        }
-        title="Delete conversation"
-    >
-        🗑️
-    </button>
+                                <button
+                                    className="delete-conversation-button"
+                                    onClick={() =>
+                                        handleDeleteConversation(
+                                            conversation.id
+                                        )
+                                    }
+                                    title="Delete conversation"
+                                >
+                                    🗑️
+                                </button>
 
-</div>
+                            </div>
 
                         )
                     )}
@@ -577,6 +581,7 @@ function Chat() {
 
                                 )
                             )}
+                            <div ref={messageEndRef} />
 
                         </div>
 

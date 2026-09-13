@@ -22,24 +22,48 @@ def get_db():
 
 @router.get("/")
 def get_conversations(
-    db:Session=Depends(get_db),
-    current_user:User=Depends(get_current_user)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    conversations=(
+    conversations = (
         db.query(Conversation)
-        .filter(Conversation.user_id==current_user.id)
+        .filter(Conversation.user_id == current_user.id)
         .order_by(Conversation.created_at.desc())
         .all()
     )
 
-    return [{
-        "id":conversation.id,
-        "title":conversation.title,
-        "created_by":conversation.created_at,
-        "updated_at": conversation.updated_at
-    }
-    for conversation in conversations
-    ]
+    result = []
+
+    for conversation in conversations:
+
+        first_message = (
+            db.query(Message)
+            .filter(
+                Message.conversation_id == conversation.id,
+                Message.role == "user"
+            )
+            .order_by(Message.created_at.asc())
+            .first()
+        )
+
+        title = (
+            first_message.content
+            if first_message
+            else "New Conversation"
+        )
+
+        # Keep sidebar title short
+        if len(title) > 40:
+            title = title[:40] + "..."
+
+        result.append({
+            "id": conversation.id,
+            "title": title,
+            "created_at": conversation.created_at,
+            "updated_at": conversation.updated_at
+        })
+
+    return result
 
 @router.get("/{conversation_id}")
 def get_conversation(
