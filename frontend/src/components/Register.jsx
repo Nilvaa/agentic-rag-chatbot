@@ -1,43 +1,37 @@
 import { useState } from "react";
-import { loginUser , getCurrentUser} from "../services/api"
-import { useAuth } from "./AuthContext";
+import { registerUser } from "../services/api";
 import "./Login.css";
 
-function Login({ onSwitch }) {
-    const [email,setEmail]=useState("");
-    const [password,setPassword]=useState("");
-    const [error,setError]=useState("");
-    const [loading,setLoading]=useState(false);
+function Register({ onSwitch }) {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const { setUser } =useAuth();
-
-    async function handleSubmit(event){
+    async function handleSubmit(event) {
         event.preventDefault();
-        console.log("LOGIN BUTTON CLICKED");
-        console.log("EMAIL:", email);
-        console.log("PASSWORD:", password);
-        
         setError("");
+        setSuccess("");
         setLoading(true);
-        try{
-            const data= await loginUser(email,password);
-            console.log("login succesfull: ",data);
-            localStorage.setItem("access_token",data.access_token);
-            const currentUser= await getCurrentUser();
-            console.log("current user: ",currentUser);
-            setUser(currentUser)
-            
-        }catch(error){
-            console.error("LOGIN ERROR:", error);
+        try {
+            await registerUser(email, password);
+            setSuccess("Registration successful! Please login.");
+            setTimeout(() => {
+                onSwitch();
+            }, 2000);
+        } catch (error) {
+            console.error("REGISTER ERROR:", error);
             setError(error.message);
-        }finally{
+        } finally {
             setLoading(false);
         }
     }
+
     return (
         <div className="login-container">
             <div className="login-card">
-                <h1 className="login-title">Login</h1>
+                <h1 className="login-title">Register</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label className="form-label">Email</label>
@@ -62,16 +56,19 @@ function Login({ onSwitch }) {
                     {error && (
                         <p className="error-message">{error}</p>
                     )}
+                    {success && (
+                        <p style={{ color: "green", marginBottom: "1rem", fontSize: "0.875rem" }}>{success}</p>
+                    )}
                     <button type="submit" className="submit-button" disabled={loading}>
-                        {loading ? "Logging in.." : "Login"}
+                        {loading ? "Registering.." : "Register"}
                     </button>
                 </form>
                 <p style={{ marginTop: "1rem", textAlign: "center", fontSize: "0.9rem", color: "#555" }}>
-                    Don't have an account? <span style={{ color: "#007bff", cursor: "pointer", fontWeight: "500" }} onClick={onSwitch}>Register</span>
+                    Already have an account? <span style={{ color: "#007bff", cursor: "pointer", fontWeight: "500" }} onClick={onSwitch}>Login</span>
                 </p>
             </div>
         </div>
     );
 }
 
-export default Login;
+export default Register;

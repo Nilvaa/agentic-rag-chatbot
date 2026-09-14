@@ -153,6 +153,7 @@ button {
 
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   padding: 0 30px;
 
@@ -164,6 +165,26 @@ button {
 
   font-size: 20px;
   font-weight: 600;
+}
+
+.header-logout-button {
+  padding: 8px 18px;
+
+  background: #202123;
+  color: white;
+
+  border: none;
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.header-logout-button:hover {
+  background: #343541;
 }
 
 /* =========================

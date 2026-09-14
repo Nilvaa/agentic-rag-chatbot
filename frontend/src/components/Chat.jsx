@@ -416,6 +416,13 @@ function Chat() {
                         AI Assistant
                     </h1>
 
+                    <button
+                        className="header-logout-button"
+                        onClick={handleLogout}
+                    >
+                        Logout
+                    </button>
+
                 </header>
 
 
